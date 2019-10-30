@@ -32,12 +32,13 @@ class _HomeState extends State<HomeStatus> {
 
   Map _buildPlan() {
     Map<String, Map<String, bool>> plan = Map<String, Map<String, bool>>();
-    plan['cucina'] = {'principale': false, 'tavolo': false};
+    plan['cucina'] = {'principale': false, 'tavolo': false, 'fornelli': false};
     plan['sala'] = {'principale': false};
+    plan['bagno'] = {'principale': false};
     return plan;
   } 
 
-  void _incrementCounter() {
+  void _buttonPressed() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -51,9 +52,32 @@ class _HomeState extends State<HomeStatus> {
   @override
   Widget build(BuildContext context) {
     Map<String, Map<String, bool>> plan = _buildPlan();
-    Widget plantColumn = Column(mainAxisAlignment: MainAxisAlignment.center);
-    for amb in plan {
-
+    var rows = List<Widget>();
+    for (var amb in plan.keys) {
+      var lights = plan[amb];
+      var colsBulb = List<Widget>(); 
+      for (var lig in lights.keys) {
+        var l = Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(lig),
+            IconButton(
+              icon: Icon(Icons.lightbulb_outline),
+              tooltip: lig,
+              onPressed: _buttonPressed)
+            ]
+        );
+        colsBulb.add(l);
+      }
+      var bulbsRow = Row(children: colsBulb);
+      var row = Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Text(amb),
+          bulbsRow
+        ],
+      );
+      rows.add(row);
     }
     return Scaffold(
       appBar: AppBar(
@@ -62,33 +86,11 @@ class _HomeState extends State<HomeStatus> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Text('Cucina'),
-                Icon(Icons.lightbulb_outline)
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Text('Sala'),
-                Icon(Icons.lightbulb_outline)
-              ],
-            ),
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
+          children: rows,
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _buttonPressed,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
