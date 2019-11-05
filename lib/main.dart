@@ -12,23 +12,29 @@ class FlHomeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeStatus(title: 'ViaPiave controls'),
+      home: HomeDeviceList(title: 'ViaPiave controls'),
     );
   }
 }
 
-class HomeStatus extends StatefulWidget {
+class HomeDeviceList extends StatefulWidget {
   // Constructor that sets title to the internal variable
-  HomeStatus({Key key, this.title}) : super(key: key);
+  HomeDeviceList({Key key, this.title, this.plan}) : super(key: key);
   final String title;
+  final Plan plan;
 
   @override
-  _HomeState createState() => _HomeState();
+  _HomeState createState() => _HomeState(plan);
 }
 
 
-class _HomeState extends State<HomeStatus> {
+class _HomeState extends State<HomeDeviceList> {
   int _counter;
+  Plan plan;
+
+  _HomeState(this.plan) {
+
+  }
 
   Map _buildPlan() {
     Map<String, Map<String, bool>> plan = Map<String, Map<String, bool>>();
@@ -96,4 +102,49 @@ class _HomeState extends State<HomeStatus> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+class Plan {
+  
+  Map<String, Map<String, bool>> readDefault() {
+    Map<String, Map<String, bool>> plan = Map<String, Map<String, bool>>();
+    plan['cucina'] = {'principale': false, 'tavolo': false, 'fornelli': false};
+    plan['sala'] = {'principale': false};
+    plan['bagno'] = {'principale': false};
+    return plan;
+  }
+
+
+
+}
+
+
+class HomeSwitch extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return null;
+  }
+
+}
+
+class HomeSwitchState extends State<StatefulWidget> {
+  bool turnedON = false;
+  String ambient;
+  String light;
+
+  void _onChanged() {}
+
+  @override
+  Widget build(BuildContext context) {
+    var lightLabel = Text(light);
+    var lightSwitch = Switch(onChanged: _onChanged;
+    return Column(
+      children: <Widget>[
+        lightLabel,
+        lightSwitch
+      ],
+    );
+  }
+
 }
