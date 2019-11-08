@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 void main() => runApp(FlHomeApp());
 
 class FlHomeApp extends StatelessWidget {
+  final Plan plan = Plan();
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -12,97 +14,95 @@ class FlHomeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeDeviceList(title: 'ViaPiave controls'),
+      home: Home('ViaPiave controls', plan),
     );
   }
 }
 
-class HomeDeviceList extends StatefulWidget {
-  // Constructor that sets title to the internal variable
-  HomeDeviceList({Key key, this.title, this.plan}) : super(key: key);
-  final String title;
-  final Plan plan;
+class HomeSwitch extends StatefulWidget {
+  final String amb;
+  final String pl;
+
+  HomeSwitch(this.amb, this.pl);
 
   @override
-  _HomeState createState() => _HomeState(plan);
+  State<HomeSwitch> createState() {
+    return HomeSwitchState();
+  }
 }
 
+class HomeSwitchState extends State<HomeSwitch> {
+  bool turnedON = false;
 
-class _HomeState extends State<HomeDeviceList> {
-  int _counter;
-  Plan plan;
-
-  _HomeState(this.plan) {
-
-  }
-
-  Map _buildPlan() {
-    Map<String, Map<String, bool>> plan = Map<String, Map<String, bool>>();
-    plan['cucina'] = {'principale': false, 'tavolo': false, 'fornelli': false};
-    plan['sala'] = {'principale': false};
-    plan['bagno'] = {'principale': false};
-    return plan;
-  } 
-
-  void _buttonPressed() {
+  void _onChanged(bool svVal) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+        turnedON = svVal;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Map<String, Map<String, bool>> plan = _buildPlan();
-    var rows = List<Widget>();
-    for (var amb in plan.keys) {
-      var lights = plan[amb];
-      var colsBulb = List<Widget>(); 
-      for (var lig in lights.keys) {
-        var l = Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(lig),
-            IconButton(
-              icon: Icon(Icons.lightbulb_outline),
-              tooltip: lig,
-              onPressed: _buttonPressed)
-            ]
-        );
-        colsBulb.add(l);
-      }
-      var bulbsRow = Row(children: colsBulb);
-      var row = Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Text(amb),
-          bulbsRow
-        ],
-      );
-      rows.add(row);
+    return Column(
+      children: <Widget>[
+        Text(widget.amb + "." + widget.pl),
+        Switch(onChanged: _onChanged, value: turnedON)
+      ],
+    );
+  }
+}
+
+class AmbientCard extends StatelessWidget {
+  String ambient;
+  List<String> lights;
+
+  AmbientCard(this.ambient, this.lights) {
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> switches = List<Widget>()
+    for (var pl in lights) {
+      switches.add(HomeSwitch(ambient, pl));
+    }
+    var lightGrids = GridView.count(children: switches, crossAxisCount: 3);
+    var card = Card(child: lightGrids);
+    return card;
+  }
+  
+}
+
+
+class Home extends StatelessWidget {
+  final Plan plan;
+  final String title;
+  Map<String, Map<String, bool>> lightsState;
+
+  // Constructor that sets title to the internal variable
+  Home(this.title, this.plan) {
+    lightsState = this.plan.readDefault();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var cards = List<Widget>();
+    for (var amb in this.lightsState.keys) {
+      var lights = this.lightsState[amb];
+      cards.add(AmbientCard(amb, lights.keys));
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(this.title),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: rows,
+          children: cards,
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _buttonPressed,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      )
     );
   }
 }
+
 
 class Plan {
   
@@ -113,38 +113,5 @@ class Plan {
     plan['bagno'] = {'principale': false};
     return plan;
   }
-
-
-
 }
 
-
-class HomeSwitch extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return null;
-  }
-
-}
-
-class HomeSwitchState extends State<StatefulWidget> {
-  bool turnedON = false;
-  String ambient;
-  String light;
-
-  void _onChanged() {}
-
-  @override
-  Widget build(BuildContext context) {
-    var lightLabel = Text(light);
-    var lightSwitch = Switch(onChanged: _onChanged;
-    return Column(
-      children: <Widget>[
-        lightLabel,
-        lightSwitch
-      ],
-    );
-  }
-
-}
