@@ -52,15 +52,16 @@ class HomeSwitchState extends State<HomeSwitch> {
 }
 
 class AmbientCard extends StatelessWidget {
-  String ambient;
-  List<String> lights;
+  final String ambient;
+  final Set<String> lights;
 
   AmbientCard(this.ambient, this.lights) {
+    print("Ambient is $ambient");
   }
   
   @override
   Widget build(BuildContext context) {
-    List<Widget> switches = List<Widget>()
+    List<Widget> switches = List<Widget>();
     for (var pl in lights) {
       switches.add(HomeSwitch(ambient, pl));
     }
@@ -72,26 +73,36 @@ class AmbientCard extends StatelessWidget {
 }
 
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   final Plan plan;
   final String title;
-  Map<String, Map<String, bool>> lightsState;
+  Map<String, Set<String>> lightsState;
 
   // Constructor that sets title to the internal variable
+  //TODO Maybe read default can be moved before constructor
   Home(this.title, this.plan) {
     lightsState = this.plan.readDefault();
   }
 
+
+  @override
+  State<Home> createState() {
+    return HomeState();
+  }
+}
+
+class HomeState extends State<Home> {
+
   @override
   Widget build(BuildContext context) {
     var cards = List<Widget>();
-    for (var amb in this.lightsState.keys) {
-      var lights = this.lightsState[amb];
-      cards.add(AmbientCard(amb, lights.keys));
+    for (var amb in widget.lightsState.keys) {
+      var lights = widget.lightsState[amb];
+      cards.add(AmbientCard(amb, lights));
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.title),
+        title: Text(widget.title),
       ),
       body: Center(
         child: Column(
@@ -101,16 +112,16 @@ class Home extends StatelessWidget {
       )
     );
   }
-}
 
+}
 
 class Plan {
   
-  Map<String, Map<String, bool>> readDefault() {
-    Map<String, Map<String, bool>> plan = Map<String, Map<String, bool>>();
-    plan['cucina'] = {'principale': false, 'tavolo': false, 'fornelli': false};
-    plan['sala'] = {'principale': false};
-    plan['bagno'] = {'principale': false};
+  Map<String, Set<String>> readDefault() {
+    Map<String, Set<String>> plan = Map<String, Set<String>>();
+    plan['cucina'] = {'principale', 'tavolo', 'fornelli'};
+    plan['sala'] = {'principale'};
+    plan['bagno'] = {'principale'};
     return plan;
   }
 }
