@@ -24,9 +24,16 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
 
+  ##Gcloud for Pub/Sub
+  gcloud: ^0.6.3
+  googleapis_auth: ^0.2.10
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  test: 
+
 
 
 # For information on the generic Dart part of this file, see the

@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:flhome/pubsub.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(FlHomeApp());
@@ -35,19 +36,26 @@ class HomeSwitchState extends State<HomeSwitch> {
   bool turnedON = false;
 
   void _onChanged(bool svVal) {
-    setState(() {
-        turnedON = svVal;
-    });
+    turnedON = svVal;
+    String command;
+    if (turnedON) {
+      command = "TURN_ON";
+    } else {
+      command = "TURN_OFF";
+    }
+    String message = buildLightCommandMessage(ambient: widget.amb, light: widget.pl, command: "TURN_ON");
+    sendMessage(message);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    var col = Column(
       children: <Widget>[
         Text(widget.amb + "." + widget.pl),
         Switch(onChanged: _onChanged, value: turnedON)
       ],
     );
+    return Container(child: col, height: 15,);
   }
 }
 
@@ -65,7 +73,7 @@ class AmbientCard extends StatelessWidget {
     for (var pl in lights) {
       switches.add(HomeSwitch(ambient, pl));
     }
-    var lightGrids = GridView.count(children: switches, crossAxisCount: 3);
+    var lightGrids = GridView.count(children: switches, crossAxisCount: 3, shrinkWrap: true,);
     var card = Card(child: lightGrids);
     return card;
   }
