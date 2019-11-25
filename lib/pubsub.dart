@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:gcloud/pubsub.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
+import 'package:flutter/services.dart' show rootBundle;
 
 
 
@@ -10,7 +11,8 @@ import 'package:googleapis_auth/auth_io.dart' as auth;
 Future<bool> sendMessage(String message) async {
   print("Sending message: $message");
 // Read the service account credentials from the file.
-  var jsonCredentials = new File('gohome-cred.json').readAsStringSync();
+  String jsonCredentials = await rootBundle.loadString('conf/gohome-cred.json');
+  // var jsonCredentials = new File('conf/gohome-cred.json').readAsStringSync();
   var credentials = new auth.ServiceAccountCredentials.fromJson(jsonCredentials);
   var client = await auth.clientViaServiceAccount(credentials, PubSub.SCOPES);
   var pubsub = PubSub(client, "gohome-dev");
