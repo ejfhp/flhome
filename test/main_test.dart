@@ -5,8 +5,12 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'dart:io';
 
 import 'package:flhome/main.dart';
 
@@ -29,7 +33,19 @@ void main() {
   });
   
   test("ReadPlan", () async {
-    final plan = Plan();
+    final plan = Plan(TestAssetBundle());
     await plan.init();
+    print(plan.mapPlan);
   });
+  
+}
+
+class TestAssetBundle extends CachingAssetBundle {
+  @override
+  Future<ByteData> load(String key) async {
+    print("loading assets");
+    if (key == 'conf/gohome.json')
+      return ByteData.view(Uint8List.fromList(File(key).readAsBytesSync()).buffer);
+    return null;
+  }
 }

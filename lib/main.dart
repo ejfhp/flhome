@@ -3,12 +3,22 @@ import 'dart:convert';
 
 import 'package:flhome/pubsub.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart';
 
-void main() => runApp(FlHomeApp());
+
+Plan planConfig;
+
+void main() async {
+ print("main");
+ planConfig = Plan(rootBundle);
+ bool ok = await planConfig.init();
+ print("main, ok is $ok");
+ if (ok) {
+  runApp(FlHomeApp());
+ }
+}
 
 class FlHomeApp extends StatelessWidget {
-  final Plan plan = Plan();
   
   @override
   Widget build(BuildContext context) {
@@ -17,7 +27,45 @@ class FlHomeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Home('ViaPiave controls', plan),
+      home: Home('ViaPiave controls', planConfig),
+    );
+  }
+}
+
+class Home extends StatefulWidget {
+  String title;
+  Plan plan;
+
+  Home(this.title, this.plan);
+  
+  @override
+  State<Home> createState() {
+    return HomeState();
+  }
+}
+
+class HomeState extends State<Home> {
+  Plan plan;
+
+  @override
+  Widget build(BuildContext context) {
+    var cards = List<Widget>();
+    var mapPlan = widget.plan.mapPlan;
+    for (var amb in mapPlan.keys) {
+      var lights = mapPlan[amb];
+      cards.add(AmbientCard(amb, lights));
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column( 
+          //TODO mettere widget per scorrimento
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: cards,
+        ),
+      )
     );
   }
 }
@@ -86,59 +134,29 @@ class AmbientCard extends StatelessWidget {
 }
 
 
-class Home extends StatefulWidget {
-  final Plan plan;
-  final String title;
-  Map<String, Set<String>> lightsState;
-
-  // Constructor that sets title to the internal variable
-  //TODO Maybe read default can be moved before constructor
-  Home(this.title, this.plan) {
-    lightsState = this.plan.mapPlan;
-  }
-
-
-  @override
-  State<Home> createState() {
-    return HomeState();
-  }
-}
-
-class HomeState extends State<Home> {
-
-  @override
-  Widget build(BuildContext context) {
-    var cards = List<Widget>();
-    for (var amb in widget.lightsState.keys) {
-      var lights = widget.lightsState[amb];
-      cards.add(AmbientCard(amb, lights));
-    }
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: cards,
-        ),
-      )
-    );
-  }
-
-}
 
 class Plan {
   Map<String, Set<String>> mapPlan;
+  AssetBundle assetBundle;
+
+  Plan(this.assetBundle);
 
   Future<bool> init() async {
-    String planJson = await rootBundle.loadString('conf/gohome.json');
-    Map<String, dynamic> mapPlan = jsonDecode(planJson);
-
-    mapPlan = Map<String, Set<String>>();
-    mapPlan['cucina'] = {'principale', 'tavolo', 'fornelli'};
-    mapPlan['sala'] = {'principale'};
-    mapPlan['bagno'] = {'principale'};
+    print("Init");
+    String planJson = await this.assetBundle.loadString('conf/gohome.json');
+    Map<String, dynamic> home = jsonDecode(planJson);
+    Map<String, dynamic> ambients = home["ambients"];
+    this.mapPlan = Map<String, Set<String>>();
+    for (String a in ambients.keys) {
+      print("Reding ambient $a");
+      Map<String, dynamic> ambient = ambients[a];
+      Map<String, dynamic> points = ambient["lights"];
+      Set<String> pls = Set<String>();
+      points.forEach((k, v) {
+        pls.add(k);
+      });
+      mapPlan[a] = pls;
+    }
     return true;
   }
 }
