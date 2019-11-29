@@ -60,9 +60,7 @@ class HomeState extends State<Home> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column( 
-          //TODO mettere widget per scorrimento
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: ListView( 
           children: cards,
         ),
       )
@@ -104,11 +102,16 @@ class HomeSwitchState extends State<HomeSwitch> {
   Widget build(BuildContext context) {
     var col = Column(
       children: <Widget>[
-        Text(widget.amb + "." + widget.pl),
+        Text(widget.pl),
         Switch(onChanged: _onChanged, value: turnedON)
       ],
     );
-    return Container(child: col, height: 15,);
+    var pad = Padding(
+      child: col,
+      padding: EdgeInsets.all(8.0),
+    );
+    // return Container(child: col, height: 15,);
+    return pad;
   }
 }
 
@@ -126,9 +129,17 @@ class AmbientCard extends StatelessWidget {
     for (var pl in lights) {
       switches.add(HomeSwitch(ambient, pl));
     }
-    var lightGrids = GridView.count(children: switches, crossAxisCount: 3, shrinkWrap: true,);
-    var card = Card(child: lightGrids);
-    return card;
+    // var lightGrids = GridView.count(children: switches, crossAxisCount: 3, shrinkWrap: true,);
+    // var card = Card(child: lightGrids);
+    var title = Text(ambient);
+    var swrap = Wrap(children: switches,);
+    var room = Column(
+      children: <Widget>[
+        title,
+        swrap,
+      ],
+    );
+    return room;
   }
   
 }
