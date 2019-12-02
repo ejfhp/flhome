@@ -129,17 +129,25 @@ class AmbientCard extends StatelessWidget {
     for (var pl in lights) {
       switches.add(HomeSwitch(ambient, pl));
     }
-    // var lightGrids = GridView.count(children: switches, crossAxisCount: 3, shrinkWrap: true,);
-    // var card = Card(child: lightGrids);
-    var title = Text(ambient);
-    var swrap = Wrap(children: switches,);
+    var title = Text(ambient.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15,));
+    var swrap = Wrap(children: switches,
+    direction: Axis.horizontal,
+    runAlignment: WrapAlignment.start,
+    );
     var room = Column(
       children: <Widget>[
         title,
         swrap,
       ],
     );
-    return room;
+    var padd = Container(
+      child: room,
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1, color: Colors.black),
+        color: Colors.blue),
+    );
+    return padd;
   }
   
 }
