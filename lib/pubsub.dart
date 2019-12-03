@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:gcloud/pubsub.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;

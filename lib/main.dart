@@ -10,6 +10,7 @@ Plan planConfig;
 
 void main() async {
  print("main");
+ WidgetsFlutterBinding.ensureInitialized();
  planConfig = Plan(rootBundle);
  bool ok = await planConfig.init();
  print("main, ok is $ok");
